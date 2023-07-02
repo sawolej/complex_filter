@@ -1,17 +1,11 @@
 import sys
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from skimage.filters import threshold_otsu
-import numpy as np
-import matplotlib.pyplot as plt
 
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-
-import os
 
 def go_get_them(file_path):
 

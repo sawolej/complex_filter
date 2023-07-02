@@ -1,5 +1,4 @@
 import sys
-
 import pandas as pd
 from skimage.filters import threshold_otsu
 
@@ -98,14 +97,14 @@ def cut_me(data):
 
 
 
-    # plt.imshow(edges, cmap='binary_r')
-    # plt.colorbar()
-    # plt.title("edg")
-    # plt.show()
-    # plt.imshow(data_uint8, cmap='binary_r')
-    # plt.colorbar()
-    # plt.title("edges")
-    # plt.show()
+    plt.imshow(edges, cmap='binary_r')
+    plt.colorbar()
+    plt.title("edg")
+    plt.show()
+    plt.imshow(data_uint8, cmap='binary_r')
+    plt.colorbar()
+    plt.title("edges")
+    plt.show()
 
     rows, _ = data.shape
     up = start_of_object
@@ -125,7 +124,7 @@ def thereshold_background_correction(phaseMreal):
     # orig and naive - smoll noises, lots of objects
     # Apply Otsu's thresholding
     thresh = threshold_otsu(phaseMreal)
-    binary = phaseMreal > thresh + 0.35 # -0.1 # TODO automate this. for now may be need to manully adjust thereshold
+    binary = phaseMreal > thresh + 0.1 # -0.1 # TODO automate this. for now may be need to manully adjust thereshold
     '''
         thresh = threshold_otsu(phaseMreal)
 
@@ -170,14 +169,14 @@ def thereshold_background_correction(phaseMreal):
 
     phase_bg_corr = (phase_bg_corr - np.nanmin(phase_bg_corr)) / (np.nanmax(phase_bg_corr) - np.nanmin(phase_bg_corr))
 
-    # fig, (ax1, ax2) = plt.subplots(1, 2)
-    #
-    # ax1.imshow(phase_masked, cmap='binary_r')
-    # ax1.set_title('masked')
-    # ax2.imshow(phase_bg_corr, cmap='binary_r')
-    # ax2.set_title('Corrected Phase')
-    #
-    # plt.show()
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+
+    ax1.imshow(phase_masked, cmap='binary_r')
+    ax1.set_title('masked')
+    ax2.imshow(phase_bg_corr, cmap='binary_r')
+    ax2.set_title('Corrected Phase')
+
+    plt.show()
 
     # fig, (ax1) = plt.subplots(1, 1)
     #

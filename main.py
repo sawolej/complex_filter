@@ -11,8 +11,8 @@ def whole(imag_data, phaseMreal, imagMreal,phase, magnitude):
     plt.imshow(phaseMreal, cmap='binary_r');plt.colorbar();plt.title("Phase filter with real part");plt.savefig("2")
     plt.imshow(phaseMrealFiltr, cmap='binary_r');plt.title("Phase|real background correction");plt.savefig("3")
     imagMrealFiltr = filter.background_correction(imagMreal, up, dp)
-    plt.imshow(imagMreal, cmap='binary_r');plt.title("Phase filter with real part");plt.savefig("4")
-    plt.imshow(imagMrealFiltr, cmap='binary_r');plt.title("Phase|real background correction");plt.savefig("5")
+    plt.imshow(imagMreal, cmap='binary_r');plt.title("Imag filter with real part");plt.savefig("4")
+    plt.imshow(imagMrealFiltr, cmap='binary_r');plt.title("Imag|real background correction");plt.savefig("5")
     phaseFiltr = filter.background_correction(phase, up, dp)
     plt.imshow(phaseFiltr, cmap='binary_r'); plt.title("Phase background correction"); plt.savefig("6")
     magnitudeFiltr = filter.background_correction(magnitude, up, dp)
@@ -34,7 +34,7 @@ def part(phaseMreal, imagMreal,phase, magnitude):
     return phaseFiltr, magnitude
 
 def main(file_path, opt):
-    print("About to save image...")
+
     real_data, imag_data, magnitude, phase, phaseMreal, imagMreal = filter.go_get_them(file_path)
     if opt == 1:
         phaseFiltr, magnitudeFiltr = part(phaseMreal, imagMreal, phase, magnitude)
@@ -55,3 +55,4 @@ if __name__ == "__main__":
 
         main(args.file, int(args.param))
 
+2

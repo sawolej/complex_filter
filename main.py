@@ -7,8 +7,7 @@ import argparse
 
 def whole(imag_data, phaseMreal, imagMreal,phase, magnitude):
     up, dp = filter.cut_me(imag_data)
-    print(up)
-    print(dp)
+
     phaseMrealFiltr = filter.background_correction(phaseMreal, up, dp)
     plt.imshow(phaseMreal, cmap='binary_r');plt.gca().invert_yaxis(); plt.colorbar();plt.title("Phase filter with real part");plt.savefig("2")
     plt.imshow(phaseMrealFiltr, cmap='binary_r');plt.gca().invert_yaxis(); plt.title("Phase background correction");plt.savefig("3")

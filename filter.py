@@ -11,33 +11,24 @@ def crop_to_match(a, b):
 
 
 def resample_to_match(smaller, larger):
-    # Calculate the zoom factor for rows and columns
     zoom_rows = larger.shape[0] / smaller.shape[0]
     zoom_cols = larger.shape[1] / smaller.shape[1]
 
-    # Use scipy's zoom to resample the smaller image to the size of the larger one
     resampled = zoom(smaller, (zoom_rows, zoom_cols))
 
     return resampled
 
 
 def background_denoise(imag_data, phaseMreal, imagMreal, phase, magnitude, background):
-    # Load the background data
     real_dataB, imag_dataB, magnitudeB, phaseB, phaseMrealB, imagMrealB = go_get_them(background)
-
 
     phaseMreal_diff = mean_difference(phaseMrealB)
     clear = phaseMrealB - phaseMreal_diff
     diff = resample_to_match(phaseMreal_diff, phaseMreal)
-
     denois = phaseMreal - (diff/2)
-    # You may want to visualize your denoised data
-
-    # Create the subplots
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 
 
-    # Set the images and titles
     ax1.imshow(diff, cmap='binary_r')
     ax1.set_title('diff')
     ax2.imshow(magnitude, cmap='binary_r')
@@ -159,9 +150,7 @@ def cut_me(data):
     if start_of_object is None or end_of_object is None:
         return None
     else:
-        # Now 'start_of_object' and 'end_of_object' should contain the y-coordinates of the start and end of your object
 
-        # You can draw these lines onto your image as follows:
         cv2.line(data_uint8, (0, start_of_object), (data_uint8.shape[1] - 1, start_of_object), (0, 0, 255), 2)
         cv2.line(data_uint8, (0, end_of_object), (data_uint8.shape[1] - 1, end_of_object), (0, 0, 255), 2)
 

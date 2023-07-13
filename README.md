@@ -9,7 +9,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-To run the main script, navigate to the project directory and type:
+To run the main script, navigate to the directory with dataset and run in cmd:
 
 ```bash
 python path\to\main.py -f filename -p param

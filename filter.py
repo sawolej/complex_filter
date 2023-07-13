@@ -1,10 +1,70 @@
 import sys
 import pandas as pd
 from skimage.filters import threshold_otsu
-
+from scipy.ndimage import zoom
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+
+def crop_to_match(a, b):
+    return a[:b.shape[0], :b.shape[1]]
+
+
+def resample_to_match(smaller, larger):
+    # Calculate the zoom factor for rows and columns
+    zoom_rows = larger.shape[0] / smaller.shape[0]
+    zoom_cols = larger.shape[1] / smaller.shape[1]
+
+    # Use scipy's zoom to resample the smaller image to the size of the larger one
+    resampled = zoom(smaller, (zoom_rows, zoom_cols))
+
+    return resampled
+
+
+def background_denoise(imag_data, phaseMreal, imagMreal, phase, magnitude, background):
+    # Load the background data
+    real_dataB, imag_dataB, magnitudeB, phaseB, phaseMrealB, imagMrealB = go_get_them(background)
+
+
+    phaseMreal_diff = mean_difference(phaseMrealB)
+    clear = phaseMrealB - phaseMreal_diff
+    diff = resample_to_match(phaseMreal_diff, phaseMreal)
+
+    denois = phaseMreal - (diff/2)
+    # You may want to visualize your denoised data
+
+    # Create the subplots
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+
+
+    # Set the images and titles
+    ax1.imshow(diff, cmap='binary_r')
+    ax1.set_title('diff')
+    ax2.imshow(magnitude, cmap='binary_r')
+    ax2.set_title('orig')
+    ax3.imshow(clear, cmap='binary_r')
+    ax3.set_title('clear')
+    ax4.imshow(denois, cmap='binary_r')
+    ax4.set_title('denois')
+    plt.subplots_adjust(hspace=0.5)
+    plt.show()
+
+    plt.imshow(denois, cmap='binary_r');
+    plt.title("background correction v2");
+    plt.savefig("backgroundCorr")
+
+    return phaseMreal_diff
+
+
+def mean_difference(orig):
+    # Calculate the mean value of all pixels
+    mean_value = np.mean(orig)
+
+    # Create a new matrix where each pixel is the difference between the original pixel and the mean
+    difference_matrix = orig - mean_value
+    difference_matrix = np.flipud(difference_matrix)
+    return difference_matrix
+
 
 def go_get_them(file_path):
 
@@ -49,20 +109,30 @@ def go_get_them(file_path):
     # Create the subplots
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 
-    # Set the images and titles
-    ax1.imshow(real_data, cmap='binary_r')
+    img1 = ax1.imshow(real_data, cmap='binary_r')
     ax1.set_title('Real Part')
-    ax2.imshow(imag_data, cmap='binary_r')
-    ax2.set_title('Imaginary Part')
-    ax3.imshow(magnitude, cmap='binary_r')
-    ax3.set_title('Magnitude')
-    ax4.imshow(phase, cmap='binary_r')
-    ax4.set_title('Phase')
+    ax1.invert_yaxis()
+    fig.colorbar(img1, ax=ax1)
 
-    # Adjust the spacing between rows
-    plt.subplots_adjust(hspace=0.5)  # Increase the value to increase spacing
+    img2 = ax2.imshow(imag_data, cmap='binary_r')
+    ax2.set_title('Imaginary Part')
+    ax2.invert_yaxis()
+    fig.colorbar(img2, ax=ax2)
+
+    img3 = ax3.imshow(magnitude, cmap='binary_r')
+    ax3.set_title('Magnitude')
+    ax3.invert_yaxis()
+    fig.colorbar(img3, ax=ax3)
+
+    img4 = ax4.imshow(phase, cmap='binary_r')
+    ax4.set_title('Phase')
+    ax4.invert_yaxis()
+    fig.colorbar(img4, ax=ax4)
+
+    plt.subplots_adjust(hspace=0.5)
     plt.savefig('1.png')
     plt.close()
+
     return real_data, imag_data, magnitude, phase, phaseMreal, imagMreal
 
 
@@ -96,15 +166,15 @@ def cut_me(data):
         cv2.line(data_uint8, (0, end_of_object), (data_uint8.shape[1] - 1, end_of_object), (0, 0, 255), 2)
 
 
-
-    plt.imshow(edges, cmap='binary_r')
-    plt.colorbar()
-    plt.title("edg")
-    plt.show()
-    plt.imshow(data_uint8, cmap='binary_r')
-    plt.colorbar()
-    plt.title("edges")
-    plt.show()
+    #
+    # plt.imshow(edges, cmap='binary_r')
+    # plt.colorbar()
+    # plt.title("edg")
+    # plt.show()
+    # plt.imshow(data_uint8, cmap='binary_r')
+    # plt.colorbar()
+    # plt.title("edges")
+    # plt.show()
 
     rows, _ = data.shape
     up = start_of_object
@@ -122,42 +192,38 @@ def thereshold_background_correction(phaseMreal):
     still may be need for manually adjust parameters based of type of object or streight of the cable noises
     """
     # orig and naive - smoll noises, lots of objects
-    # Apply Otsu's thresholding
-    thresh = threshold_otsu(phaseMreal)
-    binary = phaseMreal > thresh + 0.1 # -0.1 # TODO automate this. for now may be need to manully adjust thereshold
-    '''
-        thresh = threshold_otsu(phaseMreal)
+    # Apply Otsu thresholding
+    ''''''
+    # thresh = threshold_otsu(phaseMreal)
+    # binary = phaseMreal > thresh + 0.25 # -0.1 # TODO automate this. for now may be need to manully adjust thereshold
+    ''''''
+    ''''''
+    # thresh = threshold_otsu(phaseMreal)
+    #
+    # columns_left = phaseMreal.shape[1] // 2
+    #
+    # phaseMreal_left = phaseMreal[:, :columns_left]
+    # phaseMreal_right = phaseMreal[:, columns_left:]
+    #
+    # binary_left = phaseMreal_left > thresh - 0.3
+    # binary_right = phaseMreal_right > (thresh + 0.3)
+    #
+    # binary = np.hstack((binary_left, binary_right))
+    ''''''
 
-        columns_left = phaseMreal.shape[1] // 2
-
-        phaseMreal_left = phaseMreal[:, :columns_left]
-        phaseMreal_right = phaseMreal[:, columns_left:]
-
-        binary_left = phaseMreal_left > thresh - 0.3
-        binary_right = phaseMreal_right > (thresh + 0.3)
-
-        binary = np.hstack((binary_left, binary_right))
-    '''
-
-    ''' #good to separate objects/material changes, will completly remove teh noises.TODO automatic detection
-    columns_left = 50 # adjust this value as per your requirement
+    # #good to separate objects/material changes, will completly remove teh noises.TODO automatic detection
+    columns_left = 20
 
     # Split the image into two parts
     phaseMreal_left = phaseMreal[:, :columns_left]
     phaseMreal_right = phaseMreal[:, columns_left:]
-
-    # Apply Otsu's thresholding to each part
     thresh_left = threshold_otsu(phaseMreal_left)
     thresh_right = threshold_otsu(phaseMreal_right)
-
-    # Threshold each part
-    binary_left = phaseMreal_left > thresh_left
-    binary_right = phaseMreal_right > thresh_right
-
-    # Combine the parts back together
+    binary_left = phaseMreal_left > thresh_left -0.2
+    binary_right = phaseMreal_right > thresh_right +0.1
     binary = np.hstack((binary_left, binary_right))
 
-    '''
+
     background_mask = binary
 
     phase_masked = phaseMreal.copy()
@@ -204,10 +270,12 @@ def background_correction(data, up, dp):
 
     average_mean_difference = (mean_difference_per_column_first + mean_difference_per_column_last) / 2
 
-    if(dp>2):
-        corrected_data = data - average_mean_difference
-    else:
+    if(dp<3):
         corrected_data = data - mean_difference_per_column_first
+    elif(up<3):
+        corrected_data = data - mean_difference_per_column_last
+    else:
+        corrected_data = data - average_mean_difference
 
     corrected_data = (corrected_data - np.min(corrected_data)) / (np.max(corrected_data) - np.min(corrected_data))
 

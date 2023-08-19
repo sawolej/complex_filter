@@ -1,4 +1,6 @@
 import sys
+import openpyxl
+import os
 import pandas as pd
 from skimage.filters import threshold_otsu
 from scipy.ndimage import zoom
@@ -96,6 +98,31 @@ def go_get_them(file_path):
 
     phaseMreal = (phaseMreal - np.min(phaseMreal)) / (np.max(phaseMreal) - np.min(phaseMreal))
     imagMreal = (imagMreal - np.min(imagMreal)) / (np.max(imagMreal) - np.min(imagMreal))
+
+       output_folder = "cyferki"
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Save phase data
+    phase_df = pd.DataFrame(phase)  # Limit to 20 rows as per your comment
+    phase_df.to_csv(os.path.join(output_folder, 'phase_data.csv'), index=False)
+    phase_df.to_excel(os.path.join(output_folder, 'phase_data.xlsx'), index=False, engine='openpyxl')
+
+    # Save magnitude data
+    magnitude_df = pd.DataFrame(magnitude)
+    magnitude_df.to_csv(os.path.join(output_folder, 'magnitude_data.csv'), index=False)
+    magnitude_df.to_excel(os.path.join(output_folder, 'magnitude_data.xlsx'), index=False, engine='openpyxl')
+
+    # Save imaginary part data
+    imag_df = pd.DataFrame(imag_data)
+    imag_df.to_csv(os.path.join(output_folder, 'imag_data.csv'), index=False)
+    imag_df.to_excel(os.path.join(output_folder, 'imag_data.xlsx'), index=False, engine='openpyxl')
+
+    # Save real part data
+    real_df = pd.DataFrame(real_data)
+    real_df.to_csv(os.path.join(output_folder, 'real_data.csv'), index=False)
+    real_df.to_excel(os.path.join(output_folder, 'real_data.xlsx'), index=False, engine='openpyxl')
+
 
     # Create the subplots
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
